@@ -1,50 +1,167 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+=============================================================================
+SYNC IMPACT REPORT
+=============================================================================
+Version change: 1.0.0 → 1.1.0 (Minor update)
+
+Modified principles:
+  - VII. 先进技术体系: 新增 Context7 MCP 文档检索要求
+
+Added sections: None
+
+Removed sections: None
+
+Templates requiring updates:
+  - .specify/templates/plan-template.md: ✅ Compatible
+  - .specify/templates/spec-template.md: ✅ Compatible
+  - .specify/templates/tasks-template.md: ✅ Compatible
+
+Follow-up TODOs: None
+=============================================================================
+-->
+
+# Communication Translator 项目宪法
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. 代码质量 (Code Quality)
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+代码质量是项目的基石，所有代码 MUST 遵循以下标准：
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+- **可读性**: 代码 MUST 清晰易懂，变量和函数命名 MUST 准确表达其用途
+- **一致性**: 项目内 MUST 保持统一的代码风格和命名规范
+- **简洁性**: 代码 MUST 简洁高效，避免冗余和重复逻辑
+- **可维护性**: 代码结构 MUST 便于后续修改和扩展
+- **注释规范**: 代码注释 MUST 使用中文，清晰解释复杂逻辑的意图而非实现细节
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+**理由**: 高质量代码降低维护成本，减少缺陷，提升团队协作效率。
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### II. 测试标准 (Testing Standards)
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+测试是保障软件质量的关键手段：
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- **测试覆盖**: 核心业务逻辑 MUST 具备单元测试覆盖
+- **测试类型**: MUST 包含单元测试、集成测试；契约测试 SHOULD 用于服务间通信
+- **测试命名**: 测试用例命名 MUST 清晰描述被测场景和预期结果
+- **测试独立性**: 每个测试 MUST 独立运行，不依赖其他测试的执行顺序或状态
+- **边界测试**: MUST 覆盖边界条件和异常场景
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+**理由**: 完善的测试体系是重构和迭代的安全网，确保系统稳定性。
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### III. 用户体验一致性 (UX Consistency)
+
+用户体验 MUST 在整个产品中保持一致：
+
+- **交互模式**: 相似功能 MUST 采用一致的交互方式
+- **视觉规范**: UI 组件 MUST 遵循统一的设计规范
+- **反馈机制**: 用户操作 MUST 有明确、及时的反馈
+- **错误处理**: 错误信息 MUST 友好且具有指导性
+- **响应式设计**: 界面 MUST 适配不同设备和屏幕尺寸
+
+**理由**: 一致的用户体验降低学习成本，提升用户满意度和产品专业度。
+
+### IV. 性能要求 (Performance Requirements)
+
+性能是产品竞争力的核心要素：
+
+- **响应时间**: API 响应时间 SHOULD 控制在 200ms 以内 (P95)
+- **资源效率**: 内存和 CPU 使用 MUST 在合理范围内，避免资源泄漏
+- **并发处理**: 系统 MUST 支持预期的并发负载
+- **优化策略**: 性能优化 MUST 基于实际测量数据，而非主观猜测
+- **监控指标**: 关键性能指标 MUST 具备监控和告警机制
+
+**理由**: 良好的性能直接影响用户体验和系统可扩展性。
+
+### V. 务实的面向对象设计 (Pragmatic OO Design)
+
+设计 MUST 务实，避免过度工程化：
+
+- **YAGNI 原则**: 不做超前设计，只实现当前需要的功能
+- **适度封装**: 封装 MUST 服务于代码复用和职责分离，不做无意义的抽象
+- **设计模式**: 仅在解决实际问题时使用设计模式，不为模式而模式
+- **继承谨慎**: 优先使用组合而非继承，继承层级 SHOULD NOT 超过 3 层
+- **接口精简**: 接口 MUST 职责单一，方法数量 SHOULD 控制在合理范围
+
+**理由**: 过度设计增加复杂度和维护成本，务实的设计平衡灵活性与简洁性。
+
+### VI. 语言与沟通规范 (Language & Communication)
+
+项目沟通和代码文档遵循以下规范：
+
+- **沟通语言**: 与用户/团队沟通 MUST 使用中文
+- **代码注释**: 代码注释 MUST 使用中文，清晰准确
+- **日志输出**: 系统日志 MUST 使用英文打印，便于国际化和技术支持
+- **文档规范**: 技术文档 SHOULD 使用中文，API 文档可中英双语
+- **命名规范**: 代码标识符 MUST 使用英文，遵循业界通用命名惯例
+
+**理由**: 统一的语言规范确保团队协作效率，英文日志便于技术排查和国际化。
+
+### VII. 先进技术体系 (Modern Technology Stack)
+
+优先采用成熟先进的技术方案：
+
+- **技术选型**: MUST 优先选择市面主流、社区活跃的技术栈
+- **版本管理**: 依赖版本 MUST 保持合理更新，及时修复安全漏洞
+- **最佳实践**: MUST 遵循所选技术栈的官方最佳实践
+- **工具链**: 开发工具链 MUST 现代化，支持自动化构建、测试和部署
+- **可扩展性**: 技术架构 MUST 支持未来的功能扩展和性能提升
+- **文档检索**: 当使用第三方 API、第三方库、语言特性等时，MUST 使用 Context7 MCP 工具检索最新使用文档，确保代码实现符合最新 API 规范
+
+**理由**: 先进的技术体系提供更好的开发体验、性能和长期维护性。通过 Context7 检索最新文档可避免使用已废弃的 API 或过时的用法。
+
+## 技术标准
+
+本节定义项目的技术约束和标准：
+
+### 代码规范
+- 代码 MUST 通过静态检查工具 (Linter) 验证
+- 代码格式 MUST 通过自动格式化工具统一
+- 提交前 MUST 执行代码检查和测试
+
+### 安全标准
+- 敏感信息 MUST NOT 硬编码在代码中
+- 用户输入 MUST 经过验证和清理
+- 依赖包 MUST 定期检查安全漏洞
+
+### 日志规范
+- 日志级别 MUST 合理使用 (DEBUG, INFO, WARN, ERROR)
+- 日志内容 MUST 使用英文
+- 日志 MUST 包含足够的上下文信息用于问题排查
+- 日志格式 MUST 结构化，支持日志聚合和分析
+
+### 文档检索规范
+- 使用第三方 API 前 MUST 通过 Context7 MCP 工具检索最新文档
+- 使用第三方库前 MUST 通过 Context7 MCP 工具确认正确用法
+- 使用语言新特性前 SHOULD 通过 Context7 MCP 工具验证兼容性
+
+## 开发流程
+
+### 代码审查
+- 所有代码变更 MUST 经过代码审查
+- 审查 MUST 验证对宪法原则的遵守
+- 复杂变更 SHOULD 有设计文档支持
+
+### 质量门禁
+- 单元测试通过率 MUST 达到 100%
+- 核心模块测试覆盖率 SHOULD 不低于 80%
+- 静态代码分析 MUST 无高危问题
+
+### 部署标准
+- 部署 MUST 通过自动化流水线执行
+- 生产部署 MUST 有回滚方案
+- 配置变更 MUST 与代码变更分离管理
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+本宪法是项目的最高指导原则：
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+- **优先级**: 宪法原则优先于其他开发实践和个人偏好
+- **修订流程**: 宪法修订 MUST 经过团队讨论和文档化
+- **合规检查**: 所有代码审查和设计评审 MUST 验证对宪法的遵守
+- **例外处理**: 任何对宪法的偏离 MUST 有书面理由和批准记录
+- **版本控制**: 宪法变更遵循语义化版本规范
+  - MAJOR: 原则删除或根本性重新定义
+  - MINOR: 新增原则或重大扩展
+  - PATCH: 措辞修正、澄清或非语义性改进
+
+**Version**: 1.1.0 | **Ratified**: 2025-12-14 | **Last Amended**: 2025-12-14

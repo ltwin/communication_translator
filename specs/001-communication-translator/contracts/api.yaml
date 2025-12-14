@@ -1,0 +1,196 @@
+openapi: 3.0.3
+info:
+  title: 沟通翻译助手 API
+  description: |
+    帮助产品经理和开发工程师相互理解的 AI 翻译服务。
+
+    支持两个翻译方向：
+    - **产品→开发**: 将业务需求转化为技术语言
+    - **开发→产品**: 将技术方案转化为业务语言
+  version: 1.0.0
+  contact:
+    name: Communication Translator
+
+servers:
+  - url: http://localhost:8000
+    description: 本地开发服务器
+
+tags:
+  - name: translate
+    description: 翻译相关接口
+  - name: health
+    description: 健康检查
+
+paths:
+  /api/translate:
+    post:
+      tags:
+        - translate
+      summary: 执行翻译（流式输出）
+      description: |
+        将输入内容根据指定方向进行翻译，返回 Server-Sent Events 流式响应。
+
+        流式数据格式：
+        - 正常数据: `data: <text_chunk>\n\n`
+        - 结束标记: `data: [DONE]\n\n`
+        - 错误标记: `data: [ERROR] <message>\n\n`
+      operationId: translateContent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TranslateRequest'
+            examples:
+              productToDev:
+                summary: 产品需求翻译为技术语言
+                value:
+                  content: "我们需要一个智能推荐功能，提升用户停留时长"
+                  direction: "product_to_dev"
+              devToProduct:
+                summary: 技术方案翻译为业务语言
+                value:
+                  content: "我们优化了数据库查询，QPS提升了30%"
+                  direction: "dev_to_product"
+      responses:
+        '200':
+          description: 流式翻译响应
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: Server-Sent Events 流
+              example: |
+                data: ## 技术实现建议
+
+                data: 推荐使用协同过滤算法...
+
+                data: [DONE]
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                emptyContent:
+                  summary: 输入内容为空
+                  value:
+                    detail: "请输入需要翻译的内容"
+                    error_code: "EMPTY_CONTENT"
+                contentTooShort:
+                  summary: 输入内容过短
+                  value:
+                    detail: "输入内容过短，请提供更多上下文（至少10个字符）"
+                    error_code: "CONTENT_TOO_SHORT"
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                detail: "AI 服务暂时不可用，请稍后重试"
+                error_code: "AI_SERVICE_ERROR"
+        '504':
+          description: 请求超时
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                detail: "AI 服务响应超时，请稍后重试"
+                error_code: "TIMEOUT"
+
+  /api/health:
+    get:
+      tags:
+        - health
+      summary: 健康检查
+      description: 检查服务是否正常运行
+      operationId: healthCheck
+      responses:
+        '200':
+          description: 服务正常
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: "healthy"
+                version: "1.0.0"
+
+  /:
+    get:
+      tags:
+        - health
+      summary: 首页
+      description: 返回前端静态页面
+      operationId: getHomePage
+      responses:
+        '200':
+          description: HTML 页面
+          content:
+            text/html:
+              schema:
+                type: string
+
+components:
+  schemas:
+    TranslateRequest:
+      type: object
+      required:
+        - content
+        - direction
+      properties:
+        content:
+          type: string
+          minLength: 10
+          maxLength: 2000
+          description: 待翻译的原始内容
+          example: "我们需要一个智能推荐功能，提升用户停留时长"
+        direction:
+          $ref: '#/components/schemas/TranslationDirection'
+
+    TranslationDirection:
+      type: string
+      enum:
+        - product_to_dev
+        - dev_to_product
+      description: |
+        翻译方向：
+        - `product_to_dev`: 产品需求 → 技术语言
+        - `dev_to_product`: 技术方案 → 业务语言
+
+    ErrorResponse:
+      type: object
+      required:
+        - detail
+        - error_code
+      properties:
+        detail:
+          type: string
+          description: 用户友好的错误描述
+        error_code:
+          type: string
+          description: 错误代码
+          enum:
+            - EMPTY_CONTENT
+            - CONTENT_TOO_SHORT
+            - CONTENT_TOO_LONG
+            - INVALID_DIRECTION
+            - AI_SERVICE_ERROR
+            - TIMEOUT
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - healthy
+            - unhealthy
+          description: 服务状态
+        version:
+          type: string
+          description: API 版本号
