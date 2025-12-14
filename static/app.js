@@ -21,6 +21,7 @@ const CONFIG = {
 // 状态管理
 let isTranslating = false;
 let eventSource = null;
+let outputBuffer = '';  // 累积流式输出内容用于 Markdown 渲染
 
 /**
  * 初始化应用
@@ -188,12 +189,13 @@ async function sendTranslateRequest(content, direction) {
  * 处理 SSE 数据块
  */
 function processSSEChunk(chunk) {
-    // SSE 格式: "data: <content>\n\n"
-    const lines = chunk.split('\n');
+    // 使用正则分割：只在 \n\n 后跟 data: 或字符串结尾处分割
+    // 这样可以保留内容中的换行符（如 AI 输出的 \n 不会丢失）
+    const messages = chunk.split(/\n\n(?=data: |$)/);
 
-    for (const line of lines) {
-        if (line.startsWith('data: ')) {
-            const data = line.slice(6);  // 移除 "data: " 前缀
+    for (const message of messages) {
+        if (message.startsWith('data: ')) {
+            const data = message.slice(6);  // 移除 "data: " 前缀
             handleSSEData(data);
         }
     }
@@ -226,7 +228,7 @@ function handleSSEData(data) {
 }
 
 /**
- * 追加内容到输出区域
+ * 追加内容到输出区域（使用 Markdown 渲染）
  */
 function appendOutput(text) {
     // 移除占位文本
@@ -235,8 +237,11 @@ function appendOutput(text) {
         placeholder.remove();
     }
 
-    // 追加新内容
-    outputArea.textContent += text;
+    // 累积内容到缓冲区
+    outputBuffer += text;
+
+    // 使用 marked.js 渲染 Markdown
+    outputArea.innerHTML = marked.parse(outputBuffer);
 
     // 滚动到底部
     outputArea.scrollTop = outputArea.scrollHeight;
@@ -246,6 +251,7 @@ function appendOutput(text) {
  * 清空输出区域
  */
 function clearOutput() {
+    outputBuffer = '';  // 重置 Markdown 缓冲区
     outputArea.innerHTML = '';
     outputArea.classList.remove('typing');
 }
