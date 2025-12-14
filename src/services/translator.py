@@ -10,11 +10,12 @@ import asyncio
 from typing import AsyncGenerator
 from functools import lru_cache
 
-from openai import AsyncOpenAI, OpenAIError, APIConnectionError, AuthenticationError, RateLimitError
+from openai import OpenAIError, APIConnectionError, AuthenticationError, RateLimitError
 
-from .config import get_settings
-from .prompts import get_system_prompt
-from .models import TranslationDirection
+from src.config import get_settings
+from src.prompts import get_system_prompt
+from src.models import TranslationDirection
+from src.clients import get_deepseek_client
 
 logger = logging.getLogger(__name__)
 
@@ -31,17 +32,13 @@ class Translator:
             model: 模型名称，默认从配置读取
         """
         settings = get_settings()
-        self.api_key = api_key or settings.DEEPSEEK_API_KEY
-        self.base_url = base_url or settings.DEEPSEEK_BASE_URL
         self.model = model or settings.DEEPSEEK_MODEL
         self.timeout = settings.AI_TIMEOUT
 
-        # 初始化 OpenAI 兼容客户端
-        self.client = AsyncOpenAI(
-            api_key=self.api_key,
-            base_url=self.base_url,
-        )
-        logger.info(f"Translator initialized, model={self.model}, base_url={self.base_url}")
+        # 使用共享的 DeepSeek 客户端
+        deepseek_client = get_deepseek_client()
+        self.client = deepseek_client.get_client()
+        logger.info(f"Translator initialized, model={self.model}")
 
     async def translate_stream(
         self,

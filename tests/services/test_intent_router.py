@@ -6,7 +6,7 @@
 import pytest
 from unittest.mock import AsyncMock, patch, MagicMock
 
-from src.router import IntentRouter, IntentResult, get_intent_router
+from src.services.intent_router import IntentRouter, IntentResult, get_intent_router
 from src.models import TranslationDirection
 
 

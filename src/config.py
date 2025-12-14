@@ -15,9 +15,21 @@ from dotenv import load_dotenv
 # 加载 .env 文件
 load_dotenv()
 
+# 环境检测：dev/prod/test
+_ENV = os.getenv("ENV", "prod").lower()
+
+# 根据环境设置默认日志级别
+def _get_log_level() -> str:
+    """获取日志级别，优先使用环境变量，否则根据 ENV 设置默认值"""
+    explicit_level = os.getenv("LOG_LEVEL")
+    if explicit_level:
+        return explicit_level.upper()
+    # dev 环境默认 DEBUG，其他环境默认 INFO
+    return "DEBUG" if _ENV == "dev" else "INFO"
+
 # 配置日志
 logging.basicConfig(
-    level=os.getenv("LOG_LEVEL", "INFO"),
+    level=_get_log_level(),
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
@@ -27,14 +39,17 @@ logger = logging.getLogger(__name__)
 class Settings:
     """应用程序配置类"""
 
+    # 运行环境: dev/prod/test
+    ENV: str = _ENV
+
     # DeepSeek API 配置
     DEEPSEEK_API_KEY: str = os.getenv("DEEPSEEK_API_KEY", "")
     DEEPSEEK_BASE_URL: str = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
     DEEPSEEK_MODEL: str = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
 
     # 服务配置
-    PORT: int = int(os.getenv("PORT", "8000"))
-    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
+    PORT: int = int(os.getenv("PORT", "8080"))
+    LOG_LEVEL: str = _get_log_level()
 
     # 输入验证配置
     CONTENT_MIN_LENGTH: int = 10

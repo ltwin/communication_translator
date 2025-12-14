@@ -1,19 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-数据模型模块
+API 请求模型模块
 
-定义 API 请求/响应的 Pydantic 数据模型。
+定义 API 请求的 Pydantic 数据模型。
 """
 
-from enum import Enum
 from typing import Optional
 from pydantic import BaseModel, Field, model_validator
 
-
-class TranslationDirection(str, Enum):
-    """翻译方向枚举"""
-    PRODUCT_TO_DEV = "product_to_dev"    # 产品需求 → 技术语言
-    DEV_TO_PRODUCT = "dev_to_product"    # 技术方案 → 业务语言
+from src.models.enums import TranslationDirection
 
 
 class TranslateRequest(BaseModel):
@@ -60,26 +55,3 @@ class TranslateRequest(BaseModel):
             ]
         }
     }
-
-
-class ErrorResponse(BaseModel):
-    """错误响应模型"""
-    detail: str = Field(..., description="用户友好的错误描述")
-    error_code: str = Field(..., description="错误代码")
-
-    model_config = {
-        "json_schema_extra": {
-            "examples": [
-                {
-                    "detail": "请输入需要翻译的内容",
-                    "error_code": "EMPTY_CONTENT"
-                }
-            ]
-        }
-    }
-
-
-class HealthResponse(BaseModel):
-    """健康检查响应模型"""
-    status: str = Field(..., description="服务状态")
-    version: str = Field(..., description="API 版本号")

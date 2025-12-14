@@ -9,14 +9,14 @@
 import json
 import logging
 from functools import lru_cache
-from typing import Optional
 
-from openai import AsyncOpenAI, OpenAIError
+from openai import OpenAIError
 from pydantic import BaseModel, Field
 
-from .config import get_settings
-from .prompts import INTENT_ROUTER_PROMPT
-from .models import TranslationDirection
+from src.config import get_settings
+from src.prompts import INTENT_ROUTER_PROMPT
+from src.models import TranslationDirection
+from src.clients import get_deepseek_client
 
 logger = logging.getLogger(__name__)
 
@@ -54,16 +54,12 @@ class IntentRouter:
             model: 模型名称，默认从配置读取
         """
         settings = get_settings()
-        self.api_key = api_key or settings.DEEPSEEK_API_KEY
-        self.base_url = base_url or settings.DEEPSEEK_BASE_URL
         self.model = model or settings.DEEPSEEK_MODEL
         self.timeout = settings.AI_TIMEOUT
 
-        # 初始化 OpenAI 兼容客户端
-        self.client = AsyncOpenAI(
-            api_key=self.api_key,
-            base_url=self.base_url,
-        )
+        # 使用共享的 DeepSeek 客户端
+        deepseek_client = get_deepseek_client()
+        self.client = deepseek_client.get_client()
         logger.info(f"IntentRouter initialized, model={self.model}")
 
     async def detect_intent(self, content: str) -> IntentResult:

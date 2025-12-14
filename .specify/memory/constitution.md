@@ -2,12 +2,12 @@
 =============================================================================
 SYNC IMPACT REPORT
 =============================================================================
-Version change: 1.0.0 → 1.1.0 (Minor update)
+Version change: 1.1.0 → 1.2.0 (Minor update)
 
-Modified principles:
-  - VII. 先进技术体系: 新增 Context7 MCP 文档检索要求
+Modified principles: None
 
-Added sections: None
+Added sections:
+  - 技术标准 > Python 开发规范: 新增禁止相对导入规则
 
 Removed sections: None
 
@@ -118,6 +118,13 @@ Follow-up TODOs: None
 - 代码格式 MUST 通过自动格式化工具统一
 - 提交前 MUST 执行代码检查和测试
 
+### Python 开发规范
+- 模块导入 MUST 使用绝对导入，MUST NOT 使用相对导入
+- 导入语句格式示例：`from src.models import TranslateRequest`（正确）
+- 禁止格式示例：`from .models import TranslateRequest`（错误）
+- 禁止格式示例：`from ..services import get_translator`（错误）
+- **理由**: 绝对导入更清晰地表达模块位置，便于代码重构和移动，减少循环导入问题，提升代码可读性和可维护性
+
 ### 安全标准
 - 敏感信息 MUST NOT 硬编码在代码中
 - 用户输入 MUST 经过验证和清理
@@ -164,4 +171,4 @@ Follow-up TODOs: None
   - MINOR: 新增原则或重大扩展
   - PATCH: 措辞修正、澄清或非语义性改进
 
-**Version**: 1.1.0 | **Ratified**: 2025-12-14 | **Last Amended**: 2025-12-14
+**Version**: 1.2.0 | **Ratified**: 2025-12-14 | **Last Amended**: 2025-12-14
