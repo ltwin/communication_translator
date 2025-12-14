@@ -1,16 +1,32 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>沟通翻译助手</title>
     <link rel="stylesheet" href="/static/style.css">
+    <script>
+        // 在页面渲染前应用主题，避免闪烁
+        (function() {
+            const saved = localStorage.getItem('theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🔄 沟通翻译助手</h1>
-            <p class="subtitle">帮助产品经理和开发工程师相互理解</p>
+            <div class="header-content">
+                <h1>沟通翻译助手</h1>
+                <p class="subtitle">帮助产品经理和开发工程师相互理解</p>
+            </div>
+            <button id="theme-toggle" class="theme-toggle" type="button" title="切换主题">
+                <span class="theme-icon">暗色</span>
+            </button>
         </header>
 
         <main>
@@ -18,9 +34,9 @@
             <section class="direction-selector">
                 <h2>选择翻译方向</h2>
                 <select id="direction-select" class="direction-select">
-                    <option value="auto" selected>🤖 智能识别 - 自动识别内容类型</option>
-                    <option value="product_to_dev">📋 产品 → 开发 - 需求翻译为技术语言</option>
-                    <option value="dev_to_product">💻 开发 → 产品 - 方案翻译为业务语言</option>
+                    <option value="auto" selected>智能识别 - 自动识别内容类型</option>
+                    <option value="product_to_dev">产品 → 开发 - 需求翻译为技术语言</option>
+                    <option value="dev_to_product">开发 → 产品 - 方案翻译为业务语言</option>
                 </select>
             </section>
 
@@ -43,7 +59,7 @@
                 <div class="output-header">
                     <h2>翻译结果</h2>
                     <button id="copy-btn" type="button" class="copy-btn" title="复制全文">
-                        📋 复制
+                        复制
                     </button>
                 </div>
                 <div id="output-area" class="output-area">

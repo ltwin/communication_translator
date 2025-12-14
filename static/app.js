@@ -1,7 +1,7 @@
 /**
  * 沟通翻译助手前端逻辑
  *
- * 负责处理用户交互、翻译方向选择、流式响应显示等功能。
+ * 负责处理用户交互、翻译方向选择、流式响应显示、主题切换等功能。
  */
 
 // DOM 元素引用
@@ -11,6 +11,7 @@ const translateBtn = document.getElementById('translate-btn');
 const outputArea = document.getElementById('output-area');
 const directionSelect = document.getElementById('direction-select');
 const copyBtn = document.getElementById('copy-btn');
+const themeToggle = document.getElementById('theme-toggle');
 
 // 配置常量
 const CONFIG = {
@@ -33,9 +34,43 @@ function init() {
     translateBtn.addEventListener('click', handleTranslate);
     directionSelect.addEventListener('change', handleDirectionChange);
     copyBtn.addEventListener('click', handleCopyResult);
+    themeToggle.addEventListener('click', toggleTheme);
 
     // 初始化字符计数
     updateCharCount();
+
+    // 初始化主题按钮文字
+    updateThemeToggleText();
+}
+
+/**
+ * 获取当前主题
+ */
+function getCurrentTheme() {
+    return document.documentElement.getAttribute('data-theme') || 'light';
+}
+
+/**
+ * 切换主题
+ */
+function toggleTheme() {
+    const current = getCurrentTheme();
+    const next = current === 'light' ? 'dark' : 'light';
+
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateThemeToggleText();
+}
+
+/**
+ * 更新主题切换按钮文字
+ */
+function updateThemeToggleText() {
+    const current = getCurrentTheme();
+    const icon = themeToggle.querySelector('.theme-icon');
+    if (icon) {
+        icon.textContent = current === 'light' ? '暗色' : '亮色';
+    }
 }
 
 /**
@@ -271,7 +306,7 @@ function displayIntentMeta(meta) {
 
     const metaHtml = `
         <div class="intent-meta">
-            <span class="meta-label">🤖 智能识别:</span>
+            <span class="meta-label">智能识别:</span>
             <span class="meta-direction">${directionLabel}</span>
             <span class="meta-confidence ${confidenceClass}">(置信度: ${confidencePercent}%)</span>
         </div>
@@ -320,7 +355,7 @@ function clearOutput() {
  * 显示错误信息
  */
 function showError(message) {
-    outputArea.innerHTML = `<p class="error-text">❌ ${message}</p>`;
+    outputArea.innerHTML = `<p class="error-text">${message}</p>`;
     outputArea.classList.remove('typing');
 }
 
@@ -359,13 +394,12 @@ async function handleCopyResult() {
         await navigator.clipboard.writeText(outputBuffer);
 
         // 显示复制成功状态
-        const originalText = copyBtn.textContent;
-        copyBtn.textContent = '✅ 已复制';
+        copyBtn.textContent = '已复制';
         copyBtn.classList.add('copied');
 
         // 2秒后恢复原状
         setTimeout(() => {
-            copyBtn.textContent = originalText;
+            copyBtn.textContent = '复制';
             copyBtn.classList.remove('copied');
         }, 2000);
     } catch (err) {
@@ -388,11 +422,11 @@ function fallbackCopy(text) {
 
     try {
         document.execCommand('copy');
-        copyBtn.textContent = '✅ 已复制';
+        copyBtn.textContent = '已复制';
         copyBtn.classList.add('copied');
 
         setTimeout(() => {
-            copyBtn.textContent = '📋 复制';
+            copyBtn.textContent = '复制';
             copyBtn.classList.remove('copied');
         }, 2000);
     } catch (err) {
