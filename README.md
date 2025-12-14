@@ -12,6 +12,7 @@
 ## 环境要求
 
 - Python 3.11+
+- [uv](https://docs.astral.sh/uv/) (Python 包管理器)
 - DeepSeek API Key ([获取地址](https://platform.deepseek.com/))
 
 ## 快速开始
@@ -19,7 +20,7 @@
 ### 1. 安装依赖
 
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
 ### 2. 配置环境变量
@@ -39,13 +40,13 @@ DEEPSEEK_API_KEY=your-api-key-here
 ### 3. 启动服务
 
 ```bash
-python src/main.py
+uv run python src/app.py
 ```
 
 或使用 uvicorn 直接启动：
 
 ```bash
-uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
+uv run uvicorn src.app:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### 4. 访问应用
@@ -88,21 +89,34 @@ uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 ```
 communication_translator/
 ├── src/
-│   ├── main.py          # FastAPI 应用入口
-│   ├── config.py        # 配置管理
-│   ├── translator.py    # 翻译服务
-│   ├── router.py        # 意图路由器（智能识别）
-│   ├── prompts.py       # 提示词模板
-│   └── models.py        # 数据模型
+│   ├── app.py               # FastAPI 应用入口
+│   ├── config.py            # 配置管理
+│   ├── controllers/         # 控制器层 (API 路由)
+│   │   ├── health.py        # 健康检查接口
+│   │   └── translate.py     # 翻译接口
+│   ├── services/            # 服务层 (业务逻辑)
+│   │   ├── translator.py    # 翻译服务
+│   │   └── intent_router.py # 意图路由器 (智能识别)
+│   ├── clients/             # 客户端层 (外部服务)
+│   │   └── deepseek.py      # DeepSeek API 客户端
+│   ├── models/              # 数据模型层
+│   │   ├── enums.py         # 枚举定义
+│   │   ├── requests.py      # 请求模型
+│   │   └── responses.py     # 响应模型
+│   └── prompts/             # 提示词模板
+│       └── templates.py     # 翻译提示词
 ├── static/
-│   ├── index.html       # 前端页面
-│   ├── style.css        # 样式
-│   └── app.js           # 前端逻辑
-├── tests/               # 测试文件
-├── specs/               # 规格文档
-├── requirements.txt     # Python 依赖
-├── .env.example         # 环境变量示例
-└── README.md            # 项目说明
+│   ├── index.html           # 前端页面
+│   ├── style.css            # 样式
+│   └── app.js               # 前端逻辑
+├── tests/                   # 测试文件 (按分层组织)
+│   ├── controllers/
+│   ├── services/
+│   └── models/
+├── specs/                   # 规格文档
+├── requirements.txt         # Python 依赖
+├── .env.example             # 环境变量示例
+└── README.md                # 项目说明
 ```
 
 ## 运行测试
