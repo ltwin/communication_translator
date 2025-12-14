@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沟通翻译助手</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔄 沟通翻译助手</h1>
+            <p class="subtitle">帮助产品经理和开发工程师相互理解</p>
+        </header>
+
+        <main>
+            <!-- 翻译方向选择 -->
+            <section class="direction-selector">
+                <h2>选择翻译方向</h2>
+                <div class="direction-options">
+                    <label class="direction-option">
+                        <input type="radio" name="direction" value="product_to_dev" checked>
+                        <span class="option-content">
+                            <span class="option-icon">📋</span>
+                            <span class="option-text">
+                                <strong>产品 → 开发</strong>
+                                <small>将产品需求翻译为技术语言</small>
+                            </span>
+                        </span>
+                    </label>
+                    <label class="direction-option">
+                        <input type="radio" name="direction" value="dev_to_product">
+                        <span class="option-content">
+                            <span class="option-icon">💻</span>
+                            <span class="option-text">
+                                <strong>开发 → 产品</strong>
+                                <small>将技术方案翻译为业务语言</small>
+                            </span>
+                        </span>
+                    </label>
+                </div>
+            </section>
+
+            <!-- 输入区域 -->
+            <section class="input-section">
+                <h2>输入内容</h2>
+                <textarea
+                    id="input-content"
+                    placeholder="请输入需要翻译的内容（10-2000字符）..."
+                    maxlength="2000"
+                ></textarea>
+                <div class="input-footer">
+                    <span id="char-count">0 / 2000</span>
+                    <button id="translate-btn" type="button">开始翻译</button>
+                </div>
+            </section>
+
+            <!-- 输出区域 -->
+            <section class="output-section">
+                <h2>翻译结果</h2>
+                <div id="output-area" class="output-area">
+                    <p class="placeholder-text">翻译结果将显示在这里...</p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Powered by DeepSeek V3 | 沟通翻译助手 v1.0.0</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

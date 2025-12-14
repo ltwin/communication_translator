@@ -19,10 +19,10 @@
 
 **Purpose**: 创建项目基础结构和配置
 
-- [ ] T001 Create project directory structure (src/, static/, tests/)
-- [ ] T002 Create requirements.txt with dependencies (fastapi, uvicorn, openai, python-dotenv, pytest, pytest-asyncio)
-- [ ] T003 [P] Create .env.example with environment variable template
-- [ ] T004 [P] Create .gitignore for Python project
+- [x] T001 Create project directory structure (src/, static/, tests/)
+- [x] T002 Create requirements.txt with dependencies (fastapi, uvicorn, openai, python-dotenv, pytest, pytest-asyncio)
+- [x] T003 [P] Create .env.example with environment variable template
+- [x] T004 [P] Create .gitignore for Python project
 
 ---
 
@@ -32,11 +32,11 @@
 
 **⚠️ CRITICAL**: 此阶段必须完成后才能开始任何用户故事
 
-- [ ] T005 Implement configuration management in src/config.py (API Key, model settings, environment loading)
-- [ ] T006 Create Pydantic data models in src/models.py (TranslationDirection, TranslateRequest, ErrorResponse)
-- [ ] T007 [P] Create prompt templates in src/prompts.py (product_to_dev, dev_to_product system prompts)
-- [ ] T008 Create FastAPI application entry point in src/main.py (app instance, static files, CORS)
-- [ ] T009 Implement health check endpoint GET /api/health in src/main.py
+- [x] T005 Implement configuration management in src/config.py (API Key, model settings, environment loading)
+- [x] T006 Create Pydantic data models in src/models.py (TranslationDirection, TranslateRequest, ErrorResponse)
+- [x] T007 [P] Create prompt templates in src/prompts.py (product_to_dev, dev_to_product system prompts)
+- [x] T008 Create FastAPI application entry point in src/main.py (app instance, static files, CORS)
+- [x] T009 Implement health check endpoint GET /api/health in src/main.py
 
 **Checkpoint**: 基础设施就绪 - 可开始用户故事实现
 
@@ -50,15 +50,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T010 [P] [US1] Create unit test for product_to_dev translation in tests/test_translator.py
-- [ ] T011 [P] [US1] Create API integration test for POST /api/translate (product_to_dev) in tests/test_api.py
+- [x] T010 [P] [US1] Create unit test for product_to_dev translation in tests/test_translator.py
+- [x] T011 [P] [US1] Create API integration test for POST /api/translate (product_to_dev) in tests/test_api.py
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Implement DeepSeek API client initialization in src/translator.py (OpenAI compatible client)
-- [ ] T013 [US1] Implement translate_stream async generator in src/translator.py (product_to_dev direction)
-- [ ] T014 [US1] Implement POST /api/translate endpoint with SSE streaming in src/main.py
-- [ ] T015 [US1] Add input validation (content min/max length) and error handling in src/main.py
+- [x] T012 [US1] Implement DeepSeek API client initialization in src/translator.py (OpenAI compatible client)
+- [x] T013 [US1] Implement translate_stream async generator in src/translator.py (product_to_dev direction)
+- [x] T014 [US1] Implement POST /api/translate endpoint with SSE streaming in src/main.py
+- [x] T015 [US1] Add input validation (content min/max length) and error handling in src/main.py
 
 **Checkpoint**: 用户故事 1 可独立测试 - 后端 product_to_dev 翻译功能完整
 
@@ -72,13 +72,13 @@
 
 ### Tests for User Story 2
 
-- [ ] T016 [P] [US2] Create unit test for dev_to_product translation in tests/test_translator.py
-- [ ] T017 [P] [US2] Create API integration test for POST /api/translate (dev_to_product) in tests/test_api.py
+- [x] T016 [P] [US2] Create unit test for dev_to_product translation in tests/test_translator.py
+- [x] T017 [P] [US2] Create API integration test for POST /api/translate (dev_to_product) in tests/test_api.py
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Extend translate_stream to support dev_to_product direction in src/translator.py
-- [ ] T019 [US2] Add dev_to_product prompt template in src/prompts.py (if not already complete)
+- [x] T018 [US2] Extend translate_stream to support dev_to_product direction in src/translator.py
+- [x] T019 [US2] Add dev_to_product prompt template in src/prompts.py (if not already complete)
 
 **Checkpoint**: 用户故事 1 和 2 后端功能完整 - 双向翻译 API 可用
 
@@ -92,9 +92,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T020 [US3] Create HTML structure in static/index.html (direction selector, input textarea, output area, translate button)
-- [ ] T021 [US3] Create CSS styles in static/style.css (responsive layout, direction selector styling, input/output areas)
-- [ ] T022 [US3] Implement direction selection logic in static/app.js (radio buttons or toggle, state management)
+- [x] T020 [US3] Create HTML structure in static/index.html (direction selector, input textarea, output area, translate button)
+- [x] T021 [US3] Create CSS styles in static/style.css (responsive layout, direction selector styling, input/output areas)
+- [x] T022 [US3] Implement direction selection logic in static/app.js (radio buttons or toggle, state management)
 
 **Checkpoint**: 用户故事 3 可独立测试 - 基本 UI 结构和交互完成
 
@@ -108,11 +108,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T023 [US4] Implement EventSource SSE client in static/app.js (connect to /api/translate)
-- [ ] T024 [US4] Implement streaming text display with typing cursor effect in static/app.js
-- [ ] T025 [US4] Add loading state indicator and disable controls during translation in static/app.js
-- [ ] T026 [US4] Handle SSE connection errors and display user-friendly messages in static/app.js
-- [ ] T027 [US4] Add [DONE] and [ERROR] marker handling in static/app.js
+- [x] T023 [US4] Implement EventSource SSE client in static/app.js (connect to /api/translate)
+- [x] T024 [US4] Implement streaming text display with typing cursor effect in static/app.js
+- [x] T025 [US4] Add loading state indicator and disable controls during translation in static/app.js
+- [x] T026 [US4] Handle SSE connection errors and display user-friendly messages in static/app.js
+- [x] T027 [US4] Add [DONE] and [ERROR] marker handling in static/app.js
 
 **Checkpoint**: 完整的前后端集成 - 用户可通过 Web 界面完成双向翻译
 
@@ -122,12 +122,12 @@
 
 **Purpose**: 完善、测试验证、文档更新
 
-- [ ] T028 [P] Create README.md with project introduction, installation steps, and reference to specs/001-communication-translator/quickstart.md for test cases
-- [ ] T029 [P] Add comprehensive error handling for all edge cases in src/main.py and src/translator.py (empty input, content too short/long, API key invalid, AI service timeout with 30s limit, network errors)
-- [ ] T030 [P] Add structured logging (English) throughout the application in src/
-- [ ] T031 Run all tests and fix any failures
-- [ ] T032 Validate against quickstart.md test cases (product→dev and dev→product scenarios)
-- [ ] T033 Final code review and cleanup
+- [x] T028 [P] Create README.md with project introduction, installation steps, and reference to specs/001-communication-translator/quickstart.md for test cases
+- [x] T029 [P] Add comprehensive error handling for all edge cases in src/main.py and src/translator.py (empty input, content too short/long, API key invalid, AI service timeout with 30s limit, network errors)
+- [x] T030 [P] Add structured logging (English) throughout the application in src/
+- [x] T031 Run all tests and fix any failures
+- [x] T032 Validate against quickstart.md test cases (product→dev and dev→product scenarios)
+- [x] T033 Final code review and cleanup
 
 ---
 

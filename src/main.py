@@ -1,0 +1,138 @@
+# -*- coding: utf-8 -*-
+"""
+FastAPI 应用入口模块
+
+提供 Web API 服务，包括翻译接口和静态文件服务。
+"""
+
+import logging
+from pathlib import Path
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, StreamingResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+
+from .config import get_settings
+from .models import HealthResponse, TranslateRequest, ErrorResponse
+from .translator import get_translator
+
+# 获取配置
+settings = get_settings()
+
+# 配置日志
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """应用生命周期管理"""
+    # 启动时
+    logger.info("Application starting up")
+    logger.info(f"Version: {settings.VERSION}")
+    if not settings.DEEPSEEK_API_KEY:
+        logger.warning("DEEPSEEK_API_KEY is not configured - translation will fail")
+    else:
+        logger.info("API Key configured successfully")
+
+    yield
+
+    # 关闭时
+    logger.info("Application shutting down")
+
+
+# 创建 FastAPI 应用实例
+app = FastAPI(
+    title="沟通翻译助手 API",
+    description="帮助产品经理和开发工程师相互理解的 AI 翻译服务",
+    version=settings.VERSION,
+    lifespan=lifespan,
+)
+
+# 配置 CORS（允许前端跨域请求）
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# 静态文件目录
+STATIC_DIR = Path(__file__).parent.parent / "static"
+
+# 挂载静态文件服务（如果目录存在）
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+
+@app.get("/", include_in_schema=False)
+async def root():
+    """首页 - 返回前端页面"""
+    index_path = STATIC_DIR / "index.html"
+    if index_path.exists():
+        return FileResponse(str(index_path))
+    return {"message": "Welcome to Communication Translator API", "docs": "/docs"}
+
+
+@app.get("/api/health", response_model=HealthResponse, tags=["health"])
+async def health_check():
+    """健康检查接口"""
+    logger.info("Health check requested")
+    return HealthResponse(
+        status="healthy",
+        version=settings.VERSION
+    )
+
+
+@app.post("/api/translate", tags=["translate"])
+async def translate(request: TranslateRequest):
+    """执行翻译（流式输出）
+
+    将输入内容根据指定方向进行翻译，返回 Server-Sent Events 流式响应。
+
+    流式数据格式：
+    - 正常数据: `data: <text_chunk>\\n\\n`
+    - 结束标记: `data: [DONE]\\n\\n`
+    - 错误标记: `data: [ERROR] <message>\\n\\n`
+    """
+    logger.info(f"Translation request received, direction: {request.direction.value}")
+
+    # 检查 API Key 配置
+    if not settings.DEEPSEEK_API_KEY:
+        logger.error("API Key not configured")
+        return JSONResponse(
+            status_code=500,
+            content=ErrorResponse(
+                detail="服务配置错误，请联系管理员",
+                error_code="AI_SERVICE_ERROR"
+            ).model_dump()
+        )
+
+    # 获取翻译器并执行流式翻译
+    translator = get_translator()
+
+    async def generate_sse():
+        """生成 SSE 格式的流式响应"""
+        async for chunk in translator.translate_stream(request.content, request.direction):
+            yield f"data: {chunk}\n\n"
+
+    return StreamingResponse(
+        generate_sse(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        }
+    )
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "src.main:app",
+        host="0.0.0.0",
+        port=settings.PORT,
+        reload=True
+    )
