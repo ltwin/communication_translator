@@ -37,7 +37,7 @@ async def translate(request: TranslateRequest):
     - 错误标记: `data: [ERROR] <message>\\n\\n`
     """
     # 检查 API Key 配置
-    if not settings.DEEPSEEK_API_KEY:
+    if not settings.deepseek_api_key:
         logger.error("API Key not configured")
         return JSONResponse(
             status_code=500,

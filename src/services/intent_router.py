@@ -54,8 +54,8 @@ class IntentRouter:
             model: 模型名称，默认从配置读取
         """
         settings = get_settings()
-        self.model = model or settings.DEEPSEEK_MODEL
-        self.timeout = settings.AI_TIMEOUT
+        self.model = model or settings.deepseek_model
+        self.timeout = settings.ai_timeout
 
         # 使用共享的 DeepSeek 客户端
         deepseek_client = get_deepseek_client()

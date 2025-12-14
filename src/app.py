@@ -32,9 +32,9 @@ async def lifespan(app: FastAPI):
     """应用生命周期管理"""
     # 启动时
     logger.info("Application starting up")
-    logger.info(f"Version: {settings.VERSION}")
-    logger.info(f"Environment: {settings.ENV}, Log Level: {settings.LOG_LEVEL}")
-    if not settings.DEEPSEEK_API_KEY:
+    logger.info(f"Version: {settings.version}")
+    logger.info(f"Environment: {settings.env}, Log Level: {settings.get_log_level()}")
+    if not settings.deepseek_api_key:
         logger.warning("DEEPSEEK_API_KEY is not configured - translation will fail")
     else:
         logger.info("API Key configured successfully")
@@ -49,7 +49,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="沟通翻译助手 API",
     description="帮助产品经理和开发工程师相互理解的 AI 翻译服务",
-    version=settings.VERSION,
+    version=settings.version,
     lifespan=lifespan,
 )
 
@@ -83,12 +83,12 @@ async def root():
 if __name__ == "__main__":
     import uvicorn
 
-    is_dev = settings.ENV == "dev"
+    is_dev = settings.env == "dev"
 
     uvicorn.run(
         "src.app:app",
         host="0.0.0.0",
-        port=settings.PORT,
+        port=settings.port,
         reload=is_dev,
-        log_level=settings.LOG_LEVEL.lower(),
+        log_level=settings.get_log_level().lower(),
     )

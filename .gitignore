@@ -31,6 +31,9 @@ env/
 .env.local
 .env.*.local
 
+# YAML 配置文件 (可能包含敏感信息)
+config.yaml
+
 # IDE
 .vscode/
 .idea/

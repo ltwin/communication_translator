@@ -27,5 +27,5 @@ async def health_check():
     logger.info("Health check requested")
     return HealthResponse(
         status="healthy",
-        version=settings.VERSION
+        version=settings.version
     )

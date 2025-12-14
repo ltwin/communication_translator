@@ -30,10 +30,10 @@ class DeepSeekClient:
             model: 模型名称，默认从配置读取
         """
         settings = get_settings()
-        self.api_key = api_key or settings.DEEPSEEK_API_KEY
-        self.base_url = base_url or settings.DEEPSEEK_BASE_URL
-        self.model = model or settings.DEEPSEEK_MODEL
-        self.timeout = settings.AI_TIMEOUT
+        self.api_key = api_key or settings.deepseek_api_key
+        self.base_url = base_url or settings.deepseek_base_url
+        self.model = model or settings.deepseek_model
+        self.timeout = settings.ai_timeout
 
         # 初始化 OpenAI 兼容客户端
         self.client = AsyncOpenAI(

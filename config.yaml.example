@@ -1,0 +1,25 @@
+# 沟通翻译助手配置文件
+# 复制此文件为 config.yaml 并按需修改
+# 优先级: config.yaml > 环境变量 > 默认值
+
+# 运行环境: dev/prod/test
+# dev: 开启热重载，日志级别默认 DEBUG
+# prod/test: 关闭热重载，日志级别默认 INFO
+ENV: dev
+
+# DeepSeek API 配置
+DEEPSEEK_API_KEY: your-api-key-here
+DEEPSEEK_BASE_URL: https://api.deepseek.com
+DEEPSEEK_MODEL: deepseek-chat
+
+# 服务配置
+PORT: 8080
+# 日志级别 (可选，不设置则根据 ENV 自动选择)
+# LOG_LEVEL: INFO
+
+# 输入验证配置
+CONTENT_MIN_LENGTH: 10
+CONTENT_MAX_LENGTH: 2000
+
+# AI 服务超时 (秒)
+AI_TIMEOUT: 30
