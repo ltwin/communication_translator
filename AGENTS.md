@@ -26,33 +26,3 @@
 保持此托管块，以便'openspec-cn update'可以刷新说明。
 
 <!-- OPENSPEC:END -->
-
-# communication_translator Development Guidelines
-
-Auto-generated from all feature plans. Last updated: 2025-12-14
-
-## Active Technologies
-
-- Python 3.11+ + FastAPI, openai (Python SDK), uvicorn, python-dotenv (001-communication-translator)
-
-## Project Structure
-
-```text
-src/
-tests/
-```
-
-## Commands
-
-cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLOGIES] pytest [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLOGIES] ruff check .
-
-## Code Style
-
-Python 3.11+: Follow standard conventions
-
-## Recent Changes
-
-- 001-communication-translator: Added Python 3.11+ + FastAPI, openai (Python SDK), uvicorn, python-dotenv
-
-<!-- MANUAL ADDITIONS START -->
-<!-- MANUAL ADDITIONS END -->

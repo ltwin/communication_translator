@@ -90,14 +90,15 @@ class TestTranslateEndpointValidation:
         assert response.status_code == 422  # Pydantic 验证错误
 
     @pytest.mark.asyncio
-    async def test_translate_missing_direction_returns_error(self):
-        """测试缺少翻译方向返回错误"""
+    async def test_translate_missing_direction_without_auto_detect_returns_error(self):
+        """测试缺少翻译方向且未启用自动检测时返回错误"""
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as client:
             response = await client.post(
                 "/api/translate",
                 json={
-                    "content": "这是一段足够长的测试内容"
+                    "content": "这是一段足够长的测试内容",
+                    "auto_detect": False
                 }
             )
 
@@ -116,6 +117,23 @@ class TestTranslateEndpointValidation:
             )
 
         assert response.status_code == 422  # Pydantic 验证错误
+
+    @pytest.mark.asyncio
+    async def test_translate_auto_detect_without_direction_is_valid(self):
+        """测试启用自动检测时可以不指定方向"""
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            response = await client.post(
+                "/api/translate",
+                json={
+                    "content": "我们需要一个智能推荐功能，提升用户停留时长",
+                    "auto_detect": True
+                }
+            )
+
+        # 应该通过验证（可能因为没有 API Key 返回 500，或成功返回 200/400）
+        # 不应该返回 422 验证错误
+        assert response.status_code != 422
 
 
 class TestTranslateEndpointIntegration:

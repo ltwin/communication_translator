@@ -17,28 +17,11 @@
             <!-- 翻译方向选择 -->
             <section class="direction-selector">
                 <h2>选择翻译方向</h2>
-                <div class="direction-options">
-                    <label class="direction-option">
-                        <input type="radio" name="direction" value="product_to_dev" checked>
-                        <span class="option-content">
-                            <span class="option-icon">📋</span>
-                            <span class="option-text">
-                                <strong>产品 → 开发</strong>
-                                <small>将产品需求翻译为技术语言</small>
-                            </span>
-                        </span>
-                    </label>
-                    <label class="direction-option">
-                        <input type="radio" name="direction" value="dev_to_product">
-                        <span class="option-content">
-                            <span class="option-icon">💻</span>
-                            <span class="option-text">
-                                <strong>开发 → 产品</strong>
-                                <small>将技术方案翻译为业务语言</small>
-                            </span>
-                        </span>
-                    </label>
-                </div>
+                <select id="direction-select" class="direction-select">
+                    <option value="auto" selected>🤖 智能识别 - 自动识别内容类型</option>
+                    <option value="product_to_dev">📋 产品 → 开发 - 需求翻译为技术语言</option>
+                    <option value="dev_to_product">💻 开发 → 产品 - 方案翻译为业务语言</option>
+                </select>
             </section>
 
             <!-- 输入区域 -->
@@ -57,7 +40,12 @@
 
             <!-- 输出区域 -->
             <section class="output-section">
-                <h2>翻译结果</h2>
+                <div class="output-header">
+                    <h2>翻译结果</h2>
+                    <button id="copy-btn" type="button" class="copy-btn" title="复制全文">
+                        📋 复制
+                    </button>
+                </div>
                 <div id="output-area" class="output-area">
                     <p class="placeholder-text">翻译结果将显示在这里...</p>
                 </div>

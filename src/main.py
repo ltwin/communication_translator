@@ -5,6 +5,7 @@ FastAPI 应用入口模块
 提供 Web API 服务，包括翻译接口和静态文件服务。
 """
 
+import json
 import logging
 from pathlib import Path
 from contextlib import asynccontextmanager
@@ -17,6 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import get_settings
 from .models import HealthResponse, TranslateRequest, ErrorResponse
 from .translator import get_translator
+from .router import get_intent_router
 
 # 获取配置
 settings = get_settings()
@@ -93,12 +95,11 @@ async def translate(request: TranslateRequest):
     将输入内容根据指定方向进行翻译，返回 Server-Sent Events 流式响应。
 
     流式数据格式：
+    - 元数据（智能模式）: `data: [META] {"detected_direction": "...", "confidence": 0.92}\\n\\n`
     - 正常数据: `data: <text_chunk>\\n\\n`
     - 结束标记: `data: [DONE]\\n\\n`
     - 错误标记: `data: [ERROR] <message>\\n\\n`
     """
-    logger.info(f"Translation request received, direction: {request.direction.value}")
-
     # 检查 API Key 配置
     if not settings.DEEPSEEK_API_KEY:
         logger.error("API Key not configured")
@@ -110,12 +111,54 @@ async def translate(request: TranslateRequest):
             ).model_dump()
         )
 
+    # 确定翻译方向
+    direction = request.direction
+    intent_meta = None  # 用于存储意图识别元数据
+
+    # 智能模式：当 auto_detect=True 且 direction=None 时，调用意图识别
+    if request.auto_detect and request.direction is None:
+        logger.info("Auto-detect mode enabled, detecting intent...")
+        intent_router = get_intent_router()
+        intent_result = await intent_router.detect_intent(request.content)
+
+        # 检查置信度
+        if intent_result.confidence < 0.5:
+            # 置信度过低，返回错误提示用户手动选择
+            logger.warning(f"Intent detection confidence too low: {intent_result.confidence}")
+            return JSONResponse(
+                status_code=400,
+                content=ErrorResponse(
+                    detail=f"无法确定内容类型（置信度: {intent_result.confidence:.0%}），请手动选择翻译方向",
+                    error_code="LOW_CONFIDENCE"
+                ).model_dump()
+            )
+
+        direction = intent_result.direction
+        intent_meta = {
+            "detected_direction": direction.value,
+            "confidence": intent_result.confidence,
+            "reasoning": intent_result.reasoning
+        }
+        logger.info(f"Intent detected: {direction.value}, confidence: {intent_result.confidence:.2f}")
+
+    logger.info(f"Translation request received, direction: {direction.value}, auto_detect: {request.auto_detect}")
+
     # 获取翻译器并执行流式翻译
     translator = get_translator()
 
     async def generate_sse():
         """生成 SSE 格式的流式响应"""
-        async for chunk in translator.translate_stream(request.content, request.direction):
+        # 如果是智能模式，先发送元数据
+        if intent_meta:
+            yield f"data: [META] {json.dumps(intent_meta, ensure_ascii=False)}\n\n"
+
+            # 中等置信度时添加提示
+            if intent_meta["confidence"] < 0.8:
+                yield "data: > ⚠️ 系统自动识别翻译方向，如有误请手动选择\n\n"
+                yield "data: \n\n"
+
+        # 流式翻译输出
+        async for chunk in translator.translate_stream(request.content, direction):
             yield f"data: {chunk}\n\n"
 
     return StreamingResponse(

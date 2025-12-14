@@ -9,7 +9,8 @@ const inputContent = document.getElementById('input-content');
 const charCount = document.getElementById('char-count');
 const translateBtn = document.getElementById('translate-btn');
 const outputArea = document.getElementById('output-area');
-const directionInputs = document.querySelectorAll('input[name="direction"]');
+const directionSelect = document.getElementById('direction-select');
+const copyBtn = document.getElementById('copy-btn');
 
 // 配置常量
 const CONFIG = {
@@ -30,9 +31,8 @@ function init() {
     // 绑定事件监听器
     inputContent.addEventListener('input', handleInputChange);
     translateBtn.addEventListener('click', handleTranslate);
-    directionInputs.forEach(input => {
-        input.addEventListener('change', handleDirectionChange);
-    });
+    directionSelect.addEventListener('change', handleDirectionChange);
+    copyBtn.addEventListener('click', handleCopyResult);
 
     // 初始化字符计数
     updateCharCount();
@@ -63,12 +63,14 @@ function updateCharCount() {
 /**
  * 处理翻译方向变化
  */
-function handleDirectionChange(event) {
-    const direction = event.target.value;
+function handleDirectionChange() {
+    const direction = directionSelect.value;
     console.log('Translation direction changed to:', direction);
 
     // 更新输入提示
-    if (direction === 'product_to_dev') {
+    if (direction === 'auto') {
+        inputContent.placeholder = '请输入内容，系统将自动识别类型（10-2000字符）...';
+    } else if (direction === 'product_to_dev') {
         inputContent.placeholder = '请输入产品需求描述（10-2000字符）...';
     } else {
         inputContent.placeholder = '请输入技术方案描述（10-2000字符）...';
@@ -77,10 +79,18 @@ function handleDirectionChange(event) {
 
 /**
  * 获取当前选择的翻译方向
+ * @returns {string|null} 翻译方向，智能模式时返回 null
  */
 function getSelectedDirection() {
-    const selected = document.querySelector('input[name="direction"]:checked');
-    return selected ? selected.value : 'product_to_dev';
+    const value = directionSelect.value;
+    return value === 'auto' ? null : value;
+}
+
+/**
+ * 判断是否为智能模式
+ */
+function isAutoDetectMode() {
+    return directionSelect.value === 'auto';
 }
 
 /**
@@ -147,16 +157,25 @@ async function sendTranslateRequest(content, direction) {
         eventSource.close();
     }
 
+    // 构建请求体
+    const autoDetect = isAutoDetectMode();
+    const requestBody = {
+        content: content,
+        auto_detect: autoDetect
+    };
+
+    // 仅在手动模式时设置 direction
+    if (!autoDetect && direction) {
+        requestBody.direction = direction;
+    }
+
     // 使用 fetch 发送 POST 请求
     const response = await fetch(CONFIG.API_ENDPOINT, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            content: content,
-            direction: direction
-        })
+        body: JSON.stringify(requestBody)
     });
 
     // 检查响应状态
@@ -223,8 +242,49 @@ function handleSSEData(data) {
         return;
     }
 
+    // 处理元数据标记（智能模式）
+    if (data.startsWith('[META]')) {
+        const metaJson = data.slice(7).trim();
+        try {
+            const meta = JSON.parse(metaJson);
+            displayIntentMeta(meta);
+        } catch (e) {
+            console.error('Failed to parse META data:', e);
+        }
+        return;
+    }
+
     // 追加内容到输出区域
     appendOutput(data);
+}
+
+/**
+ * 显示意图识别元数据
+ */
+function displayIntentMeta(meta) {
+    const directionLabel = meta.detected_direction === 'product_to_dev'
+        ? '产品需求 → 技术语言'
+        : '技术方案 → 业务语言';
+
+    const confidencePercent = Math.round(meta.confidence * 100);
+    const confidenceClass = meta.confidence >= 0.8 ? 'high' : 'medium';
+
+    const metaHtml = `
+        <div class="intent-meta">
+            <span class="meta-label">🤖 智能识别:</span>
+            <span class="meta-direction">${directionLabel}</span>
+            <span class="meta-confidence ${confidenceClass}">(置信度: ${confidencePercent}%)</span>
+        </div>
+    `;
+
+    // 移除占位文本
+    const placeholder = outputArea.querySelector('.placeholder-text');
+    if (placeholder) {
+        placeholder.remove();
+    }
+
+    // 插入元数据显示
+    outputArea.insertAdjacentHTML('beforeend', metaHtml);
 }
 
 /**
@@ -275,14 +335,71 @@ function setTranslatingState(translating) {
         translateBtn.classList.add('loading');
         translateBtn.textContent = '翻译中...';
         inputContent.disabled = true;
-        directionInputs.forEach(input => input.disabled = true);
+        directionSelect.disabled = true;
     } else {
         translateBtn.disabled = false;
         translateBtn.classList.remove('loading');
         translateBtn.textContent = '开始翻译';
         inputContent.disabled = false;
-        directionInputs.forEach(input => input.disabled = false);
+        directionSelect.disabled = false;
     }
+}
+
+/**
+ * 处理复制翻译结果
+ */
+async function handleCopyResult() {
+    // 检查是否有内容可复制
+    if (!outputBuffer || outputBuffer.trim() === '') {
+        return;
+    }
+
+    try {
+        // 使用 Clipboard API 复制纯文本
+        await navigator.clipboard.writeText(outputBuffer);
+
+        // 显示复制成功状态
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = '✅ 已复制';
+        copyBtn.classList.add('copied');
+
+        // 2秒后恢复原状
+        setTimeout(() => {
+            copyBtn.textContent = originalText;
+            copyBtn.classList.remove('copied');
+        }, 2000);
+    } catch (err) {
+        console.error('Failed to copy:', err);
+        // 降级方案：使用 execCommand
+        fallbackCopy(outputBuffer);
+    }
+}
+
+/**
+ * 降级复制方案（兼容旧浏览器）
+ */
+function fallbackCopy(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-9999px';
+    document.body.appendChild(textArea);
+    textArea.select();
+
+    try {
+        document.execCommand('copy');
+        copyBtn.textContent = '✅ 已复制';
+        copyBtn.classList.add('copied');
+
+        setTimeout(() => {
+            copyBtn.textContent = '📋 复制';
+            copyBtn.classList.remove('copied');
+        }, 2000);
+    } catch (err) {
+        console.error('Fallback copy failed:', err);
+    }
+
+    document.body.removeChild(textArea);
 }
 
 // 页面加载完成后初始化
